@@ -40,11 +40,13 @@ def multiple(file_path, columns):
     for t in tables: # Because of mistakes while pasring we need to delete empty columns sometimes
 
         if t.shape[1] > 7:
-            t = t.dropna(axis='columns', how='all') # This solution works only if there is at least one full row on the page
+            t.dropna(axis='columns', how='all', inplace=True) 
+            # This solution works only if there is at least one full row on the page
             t.rename(
                 columns=col_name(t.keys(), list(range(0,7))),
                 inplace=True
             )
+            continue
         
         DATA = DATA.append(t, ignore_index=True)
     
@@ -61,7 +63,7 @@ def wow(data, i):
     """
     Join separated rows in DataFrame
     """
-    data.loc[i-1] = data.loc[i-1].combine(data.loc[i], lambda a, b: a+' '+b)
+    data.iloc[i-1] = data.iloc[i-1].combine(data.iloc[i], lambda a, b: a+' '+b)
     data.drop(i, inplace = True)
 
 
@@ -83,7 +85,7 @@ def parse_table(file_path):
         
     DATA = DATA.replace(regex=r'\r', value=' ') # В замена пробельного символа '\r' во всей таблице
     DATA = DATA.fillna('')
-    DATA['ind'] = DATA['ind'].astype(str)
+    DATA.loc[:,'ind'] = DATA['ind'].astype(str)
     for i in DATA[DATA['ind'] == ''].index.values[::-1]:
         wow(DATA, i)
     DATA.reset_index(drop=True, inplace=True)
