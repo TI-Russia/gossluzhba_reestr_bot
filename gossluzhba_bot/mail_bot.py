@@ -87,7 +87,7 @@ def send_mail(date, flag, announcement=None, diff_add=None, diff_del=None, xlsx_
     host, sender, port, password = get_config("config.ini")
     
     if flag:
-        emails = json.loads(open('emails_test.json').read())
+        emails = json.loads(open('emails.json').read())
         body = bodybuilder(
             date, 
             diff_add, 
