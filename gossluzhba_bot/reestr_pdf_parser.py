@@ -63,7 +63,7 @@ def wow(data, i):
     """
     Join separated rows in DataFrame
     """
-    data.iloc[i-1] = data.iloc[i-1].combine(data.iloc[i], lambda a, b: a+' '+b)
+    data.loc[i-1] = data.loc[i-1].combine(data.loc[i], lambda a, b: a+' '+b)
     data.drop(i, inplace = True)
 
 
@@ -92,7 +92,7 @@ def parse_table(file_path):
     DATA['ind'] = DATA['ind'].astype(float).astype(int)
     DATA['full_name'] = DATA['full_name'].str.strip()
     DATA['date_npa'] = DATA['date_npa'].str.strip()
-    DATA['npa'] = DATA['npa'].str.strip()
+    DATA['date_publishing'] = DATA['date_publishing'].str.strip()
 
     return DATA
     

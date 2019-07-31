@@ -9,19 +9,29 @@ import os
 from datetime import datetime
 
 
+def reas_str(df):
+    gr=df.groupby('next_del_reason')
+    t = ''
+    for g in gr.groups:
+        t+='\n'+g+':\n'+'\n'.join(gr.get_group(g)['full_name'].values)+'\n'
+    return t
+
+
 def bodybuilder(date, diff_add=None, diff_del=None, announcement=None):
-    if diff_add == None and diff_del == None:
+    if type(diff_add) == type(None) and type(diff_del) == type(None):
         b = ["В реестре нет изменений.",
         f"Версия реестра от {date} прикреплена к письму."]
         
     else:
+        diff_add = list(diff_add['full_name'].values)
+        diff_del = list(diff_del['full_name'].values)
         b = [f"Реестр был обновлён {date}."]
         if diff_add:
             b.extend(["В него были добалены записи:\n","\n".join(diff_add)])
         if diff_del:
             b.extend(["\nИз него были исключены записи:\n","\n".join(diff_del)])
-        if announcement:
-            b.extend(["\nИз реестра будут исключены записи:",announcement]) # !!!!!
+        if type(announcement) != type(None):
+            b.extend(["\nИз реестра будут исключены записи:", reas_str(announcement)]) # !!!!!
         
         b.append("\nАктуальная версия реестра прикреплена к письму")
 
@@ -46,7 +56,7 @@ def get_config(config_path):
 def construct_message(file_path, file_name, body, sender, emails):
     
     cdate = datetime.now().strftime("%d.%m.%Y")
-    subject = f"Тестовая рассылка. Реестр лиц, уволенных в связи с утратой доверия на {cdate}"
+    subject = f"Реестр лиц, уволенных в связи с утратой доверия на {cdate}"
 
     message = MIMEMultipart()
 
@@ -72,12 +82,12 @@ def construct_message(file_path, file_name, body, sender, emails):
     return message.as_string()
 
 
-def send_mail(date, flag, announcement=None, diff_add=None, diff_del=None, csv_file_path=None, csv_file_name=None):
+def send_mail(date, flag, announcement=None, diff_add=None, diff_del=None, xlsx_file_path=None, xlsx_file_name=None):
     
     host, sender, port, password = get_config("config.ini")
     
     if flag:
-        emails = json.loads(open('emails.json').read())
+        emails = json.loads(open('emails_test.json').read())
         body = bodybuilder(
             date, 
             diff_add, 
@@ -90,8 +100,8 @@ def send_mail(date, flag, announcement=None, diff_add=None, diff_del=None, csv_f
         body = "Eror"
     
     text = construct_message(
-        csv_file_path,
-        csv_file_name,
+        xlsx_file_path,
+        xlsx_file_name,
         body,
         sender,
         emails
